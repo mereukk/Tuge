@@ -248,6 +248,7 @@
       const abLower = ab.toLowerCase();
       if (abLower === 'inc') return 2;
       if (abLower === 'dec' || abLower === 'tog') return 1;
+      if (abLower === 's/s') return 0;
       return 1;
     }
     while (rest.length) {

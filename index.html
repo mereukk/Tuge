@@ -26,8 +26,11 @@
       </div>
       <nav class="design-list" id="designList"></nav>
       <div class="sidebar-footer">
-        <button type="button" class="btn-sidebar-footer" id="exportDesignsBtn">전체 저장</button>
-        <button type="button" class="btn-sidebar-footer" id="importDesignsBtn">불러오기</button>
+        <div class="sidebar-footer-btns">
+          <button type="button" class="btn-sidebar-footer" id="exportDesignsBtn">전체 저장</button>
+          <button type="button" class="btn-sidebar-footer" id="importDesignsBtn">불러오기</button>
+        </div>
+        <span class="sidebar-footer-note">로컬(브라우저) 저장 · 백업은 파일로</span>
       </div>
       <input type="file" id="importDesignsInput" accept=".json,application/json" hidden />
       <div class="sidebar-resize" id="sidebarResize" title="크기 조절"></div>
