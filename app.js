@@ -355,7 +355,7 @@
           const end = currentRowInput.selectionEnd ?? start;
           const before = currentRowInput.value.slice(0, start);
           const after = currentRowInput.value.slice(end);
-          const insert = `[${sym.char}]` + (sym.name ? `(${sym.name})` : '');
+          const insert = sym.char;
           currentRowInput.value = before + insert + after;
           currentRowInput.focus();
           const newPos = start + insert.length;
