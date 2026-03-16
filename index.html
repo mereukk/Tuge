@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>뜨개 도안 노트</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <h1>뜨개 도안 노트</h1>
+    <nav class="menu">
+      <button type="button" class="menu-btn active" data-page="pattern">도안 작성</button>
+      <button type="button" class="menu-btn" data-page="symbols">코바늘 기호</button>
+    </nav>
+  </header>
+
+  <main class="main-wrap" id="mainWrap">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title">도안</span>
+        <div class="sidebar-header-actions">
+          <button type="button" class="btn-add-design" id="addDesignBtn">+ 추가</button>
+          <button type="button" class="btn-sidebar-toggle" id="sidebarToggle" title="메뉴 숨기기">◀</button>
+        </div>
+      </div>
+      <nav class="design-list" id="designList"></nav>
+      <div class="sidebar-footer">
+        <button type="button" class="btn-sidebar-footer" id="exportDesignsBtn">전체 저장</button>
+        <button type="button" class="btn-sidebar-footer" id="importDesignsBtn">불러오기</button>
+      </div>
+      <input type="file" id="importDesignsInput" accept=".json,application/json" hidden />
+      <div class="sidebar-resize" id="sidebarResize" title="크기 조절"></div>
+    </aside>
+    <button type="button" class="sidebar-open-tab" id="sidebarOpenTab" title="도안 메뉴 열기">도안 ▶</button>
+    <div class="main">
+      <!-- 도안 작성 페이지 -->
+      <section id="page-pattern" class="page active">
+        <div class="pattern-toolbar">
+          <button type="button" class="btn-secondary" id="openSymbolsPopup">기호 참고 (팝업)</button>
+        </div>
+        <div class="pattern-rows" id="patternRows"></div>
+        <div class="pattern-add-actions">
+          <button type="button" class="btn-add-row" id="addRow">+ 단 추가</button>
+          <button type="button" class="btn-add-divider" id="addDividerBtn">+ 구분선</button>
+        </div>
+      <div class="pattern-export">
+        <button type="button" class="btn-primary" id="copyPattern">도안 복사</button>
+      </div>
+      </section>
+
+      <!-- 코바늘 기호 페이지 -->
+    <section id="page-symbols" class="page">
+      <p class="symbols-desc">아래 기호를 도안 작성에서 선택해 쓸 수 있습니다. 기호를 추가하면 도안에서도 바로 선택할 수 있어요.</p>
+      <div class="symbols-list" id="symbolsList"></div>
+      <div class="add-symbol">
+        <h3>기호 추가</h3>
+        <div class="add-symbol-form">
+          <input type="text" id="newSymbolName" placeholder="이름 (예: 짧은뜨기)" />
+          <input type="text" id="newSymbolChar" placeholder="기호 (영문 약어, 예: sc)" maxlength="12" />
+          <input type="text" id="newSymbolDesc" placeholder="설명 (선택)" />
+          <button type="button" class="btn-primary" id="addSymbolBtn">추가</button>
+        </div>
+      </div>
+    </section>
+    </div>
+  </main>
+
+  <!-- 기호 팝업 (도안 작성 시 참고용) -->
+  <div id="symbolsPopup" class="popup" aria-hidden="true">
+    <div class="popup-backdrop" id="popupBackdrop"></div>
+    <div class="popup-content">
+      <div class="popup-header">
+        <h2>코바늘 기호</h2>
+        <button type="button" class="popup-close" id="popupClose">×</button>
+      </div>
+      <div class="popup-body" id="popupSymbolsList"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
