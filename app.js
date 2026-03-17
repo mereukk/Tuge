@@ -207,7 +207,8 @@
         const name = nameMap.get(ab.toLowerCase());
         if (name) {
           const displayName = name === '쇠사슬뜨기' ? '사슬' : name;
-          if (name === '쇠사슬뜨기' || name === '코') out += displayName + (n > 1 ? n + '개' : ' 1개');
+          if (name === '매직링' || name === '빼뜨기') out += displayName;
+          else if (name === '쇠사슬뜨기' || name === '코') out += displayName + (n > 1 ? n + '개' : ' 1개');
           else out += displayName + (n > 1 ? ' ' + n + '코' : ' 1코');
         } else out += rest.slice(0, skip);
         rest = rest.slice(skip);
