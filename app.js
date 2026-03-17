@@ -13,7 +13,10 @@
     { id: 'tr', name: '두길긴뜨기', char: 'tr', desc: 'treble' },
     { id: 'dtr', name: '세길긴뜨기', char: 'dtr', desc: 'double treble' },
     { id: 'inc', name: '늘리기', char: 'inc', desc: 'increase' },
+<<<<<<< HEAD
     { id: 'scinc', name: '짧은뜨기 늘리기', char: 'scinc', desc: 'sc increase (2코)' },
+=======
+>>>>>>> 51468356f4f48ae778c5e47d6a2bb18af527638b
     { id: 'dec', name: '줄이기', char: 'dec', desc: 'decrease' },
     { id: 'tog', name: '모아뜨기', char: 'tog', desc: 'together' },
     { id: 'sc2tog', name: '2코 모아 짧은뜨기', char: 'sc2tog', desc: 'sc 2 together' },
@@ -247,7 +250,11 @@
     }
     function stitchValue(ab) {
       const abLower = ab.toLowerCase();
+<<<<<<< HEAD
       if (abLower === 'inc' || abLower === 'scinc') return 2;
+=======
+      if (abLower === 'inc') return 2;
+>>>>>>> 51468356f4f48ae778c5e47d6a2bb18af527638b
       if (abLower === 'dec' || abLower === 'tog') return 1;
       if (abLower === 's/s') return 0;
       return 1;

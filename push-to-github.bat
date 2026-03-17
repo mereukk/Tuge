@@ -1,11 +1,15 @@
 @echo off
-chcp 65001 >nul
 cd /d "%~dp0"
 
-echo Checking Git...
+echo ========================================
+echo   Tuge - Push to GitHub
+echo ========================================
+echo.
+
 where git >nul 2>&1
 if errorlevel 1 (
     echo Git not found. Install from https://git-scm.com/download/win
+    echo.
     pause
     exit /b 1
 )
@@ -25,21 +29,29 @@ git remote get-url origin >nul 2>&1 || (
     git remote add origin https://github.com/mereukk/Tuge.git
 )
 
-echo Pulling from origin...
-git pull origin main --rebase 2>nul
-if errorlevel 1 git pull origin main --allow-unrelated-histories --no-edit 2>nul
+echo Fetching from origin...
+git fetch origin
+echo.
+echo Rebasing onto origin/main...
+git rebase origin/main
+if errorlevel 1 (
+    echo Rebase had conflicts. Trying merge instead...
+    git rebase --abort 2>nul
+    git pull origin main --allow-unrelated-histories --no-edit
+)
 
+echo.
 echo Pushing to GitHub...
 git push -u origin main
 if errorlevel 1 (
     echo.
     echo Push failed. Check the error message above.
-    echo - If login window appeared, sign in and run this bat again.
-    echo - Or upload files manually at GitHub: Add file -^> Upload files
+    echo.
     pause
     exit /b 1
 )
 
 echo.
 echo Done. https://github.com/mereukk/Tuge
+echo.
 pause
