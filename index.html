@@ -28,11 +28,16 @@
       <div class="sidebar-footer">
         <div class="sidebar-footer-btns">
           <button type="button" class="btn-sidebar-footer" id="exportDesignsBtn">전체 저장</button>
-          <button type="button" class="btn-sidebar-footer" id="importDesignsBtn">불러오기</button>
+          <button type="button" class="btn-sidebar-footer" id="importDesignsBtn">전체 불러오기</button>
         </div>
-        <span class="sidebar-footer-note">로컬(브라우저) 저장 · 백업은 파일로</span>
+        <div class="sidebar-footer-btns">
+          <button type="button" class="btn-sidebar-footer" id="exportCurrentDesignBtn">이 도안 저장</button>
+          <button type="button" class="btn-sidebar-footer" id="importSingleDesignBtn">도안 추가</button>
+        </div>
+        <span class="sidebar-footer-note">로컬(브라우저) 저장 · 전체/개별 파일 백업 가능</span>
       </div>
       <input type="file" id="importDesignsInput" accept=".json,application/json" hidden />
+      <input type="file" id="importSingleDesignInput" accept=".json,application/json" hidden />
       <div class="sidebar-resize" id="sidebarResize" title="크기 조절"></div>
     </aside>
     <button type="button" class="sidebar-open-tab" id="sidebarOpenTab" title="도안 메뉴 열기">도안 ▶</button>

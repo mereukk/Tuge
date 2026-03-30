@@ -415,9 +415,33 @@
     }
   }
 
+  function firstDividerIndex() {
+    return pattern.rows.findIndex(r => r.type === 'divider');
+  }
+
+  function clearSectionAfterDivider(dividerIndex) {
+    const start = dividerIndex < 0 ? 0 : dividerIndex + 1;
+    for (let j = start; j < pattern.rows.length; j++) {
+      const item = pattern.rows[j];
+      if (item.type === 'divider') break;
+      if (item.type === 'row') item.done = false;
+    }
+    savePattern();
+    renderRows();
+  }
+
   function renderRows() {
     const container = $('#patternRows');
     container.innerHTML = '';
+    const fd = firstDividerIndex();
+    const hasRows = pattern.rows.some(r => r.type === 'row');
+    if (hasRows && (fd === -1 || fd > 0)) {
+      const bar = document.createElement('div');
+      bar.className = 'section-clear-bar';
+      bar.innerHTML = '<button type="button" class="btn-section-clear">첫 구간 완료 해제</button>';
+      bar.querySelector('.btn-section-clear').addEventListener('click', () => clearSectionAfterDivider(-1));
+      container.appendChild(bar);
+    }
     let rowOrdinal = 0;
     pattern.rows.forEach((item, i) => {
       if (item.type === 'divider') {
@@ -429,6 +453,7 @@
           <span class="row-divider-line"></span>
           <input type="text" class="row-divider-title" value="${escapeHtml(item.title)}" placeholder="구간 이름 (예: 귀, 머리)" data-index="${i}" />
           <span class="row-divider-line"></span>
+          <button type="button" class="btn-section-clear-divider" title="이 구간 완료 체크 해제">완료 해제</button>
           <button type="button" class="row-divider-remove" data-index="${i}" title="구분선 삭제">×</button>
         `;
         const titleInput = div.querySelector('.row-divider-title');
@@ -436,6 +461,7 @@
           pattern.rows[i].title = titleInput.value;
           savePattern();
         });
+        div.querySelector('.btn-section-clear-divider').addEventListener('click', () => clearSectionAfterDivider(i));
         div.querySelector('.row-divider-remove').addEventListener('click', () => {
           pattern.rows.splice(i, 1);
           savePattern();
@@ -669,7 +695,7 @@
         try {
           const loaded = JSON.parse(reader.result);
           if (!loaded || !Array.isArray(loaded.list) || loaded.list.length === 0) {
-            alert('올바른 도안 파일이 아니에요.');
+            alert('올바른 전체 백업 파일이 아니에요. (전체 저장으로 만든 JSON)');
             return;
           }
           const list = loaded.list.map(d => ({
@@ -685,9 +711,79 @@
           saveDesigns(designs);
           renderDesignList();
           renderRows();
-          alert('도안을 불러왔어요. (' + list.length + '개)');
+          alert('전체 도안을 불러왔어요. (' + list.length + '개)');
         } catch (e) {
           alert('파일을 읽을 수 없어요. 올바른 저장 파일인지 확인해 주세요.');
+        }
+      };
+      reader.readAsText(file, 'UTF-8');
+    };
+    input.click();
+  }
+
+  function exportCurrentDesign() {
+    const d = designs.list.find(x => x.id === designs.activeId);
+    if (!d) return;
+    d.data = pattern;
+    saveDesigns(designs);
+    const payload = {
+      format: 'tuge-single',
+      name: d.name,
+      data: JSON.parse(JSON.stringify(d.data))
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    const safe = String(d.name).replace(/[\\/:*?"<>|]/g, '_').trim().slice(0, 50) || '도안';
+    a.download = '뜨개도안_' + safe + '.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function importDesignAppend() {
+    const input = $('#importSingleDesignInput');
+    input.value = '';
+    input.onchange = () => {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const loaded = JSON.parse(reader.result);
+          let toAdd = [];
+          if (loaded.list && Array.isArray(loaded.list)) {
+            if (loaded.list.length === 0) {
+              alert('도안이 비어 있어요.');
+              return;
+            }
+            if (loaded.list.length > 1) {
+              if (!confirm('파일에 도안이 ' + loaded.list.length + '개 있습니다. 목록에 모두 추가할까요?')) return;
+            }
+            toAdd = loaded.list.map(d => ({ name: d.name, data: d.data }));
+          } else if (loaded.name != null && loaded.data) {
+            toAdd = [{ name: loaded.name, data: loaded.data }];
+          } else {
+            alert('올바른 개별 도안 파일이 아니에요. (이 도안 저장으로 만든 JSON 또는 단일 도안 형식)');
+            return;
+          }
+          let firstNewId = null;
+          toAdd.forEach((item, idx) => {
+            const id = 'd' + Date.now() + '_' + idx + '_' + Math.random().toString(36).slice(2, 8);
+            designs.list.push({
+              id,
+              name: String(item.name || '가져온 도안').trim(),
+              data: normalizeDesignData(item.data)
+            });
+            if (idx === 0) firstNewId = id;
+          });
+          designs.activeId = firstNewId;
+          pattern = designs.list.find(x => x.id === designs.activeId).data;
+          saveDesigns(designs);
+          renderDesignList();
+          renderRows();
+          alert('도안 ' + toAdd.length + '개를 목록에 추가했어요.');
+        } catch (e) {
+          alert('파일을 읽을 수 없어요.');
         }
       };
       reader.readAsText(file, 'UTF-8');
@@ -775,6 +871,8 @@
     $('#addDesignBtn').addEventListener('click', addDesign);
     $('#exportDesignsBtn').addEventListener('click', exportDesigns);
     $('#importDesignsBtn').addEventListener('click', importDesigns);
+    $('#exportCurrentDesignBtn').addEventListener('click', exportCurrentDesign);
+    $('#importSingleDesignBtn').addEventListener('click', importDesignAppend);
     document.addEventListener('click', (e) => {
       if (e.target.closest('.design-item-actions')) return;
       closeDesignDropdowns();
