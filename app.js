@@ -431,6 +431,41 @@
     renderRows();
   }
 
+  function createInsertBar(index) {
+    const bar = document.createElement('div');
+    bar.className = 'row-insert-bar';
+    bar.innerHTML = `
+      <div class="row-insert-line"></div>
+      <button type="button" class="row-insert-btn" title="여기에 추가">+</button>
+      <div class="row-insert-line"></div>
+      <div class="row-insert-menu" hidden>
+        <button type="button" class="row-insert-option" data-type="row">단</button>
+        <button type="button" class="row-insert-option" data-type="divider">구분선</button>
+        <button type="button" class="row-insert-option" data-type="memo">메모</button>
+      </div>
+    `;
+    const menu = bar.querySelector('.row-insert-menu');
+    bar.querySelector('.row-insert-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      $$('.row-insert-menu').forEach(m => { m.hidden = true; });
+      menu.hidden = !menu.hidden;
+    });
+    bar.querySelectorAll('.row-insert-option').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const type = btn.dataset.type;
+        let newItem;
+        if (type === 'row') newItem = { type: 'row', text: '', done: false };
+        else if (type === 'divider') newItem = { type: 'divider', title: '새 구간' };
+        else newItem = { type: 'memo', text: '' };
+        pattern.rows.splice(index, 0, newItem);
+        savePattern();
+        renderRows();
+      });
+    });
+    return bar;
+  }
+
   function renderRows() {
     const container = $('#patternRows');
     container.innerHTML = '';
@@ -469,6 +504,7 @@
           renderRows();
         });
         container.appendChild(div);
+        container.appendChild(createInsertBar(i + 1));
         return;
       }
       if (item.type === 'memo') {
@@ -491,6 +527,7 @@
           renderRows();
         });
         container.appendChild(memoBlock);
+        container.appendChild(createInsertBar(i + 1));
         return;
       }
       const row = item;
@@ -542,6 +579,7 @@
         renderRows();
       });
       container.appendChild(block);
+      container.appendChild(createInsertBar(i + 1));
     });
   }
 
@@ -910,6 +948,9 @@
     document.addEventListener('click', (e) => {
       if (e.target.closest('.design-item-actions')) return;
       closeDesignDropdowns();
+      if (!e.target.closest('.row-insert-bar')) {
+        $$('.row-insert-menu').forEach(m => { m.hidden = true; });
+      }
     });
 
     $('#addSymbolBtn').addEventListener('click', () => {
