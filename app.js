@@ -87,6 +87,7 @@
 
   function normalizeRowItem(r) {
     if (r && r.type === 'divider') return { type: 'divider', title: String(r.title || '').trim() };
+    if (r && r.type === 'memo') return { type: 'memo', text: r.text !== undefined ? String(r.text) : '' };
     return { type: 'row', text: r && r.text !== undefined ? String(r.text) : '', done: !!(r && r.done) };
   }
 
@@ -470,6 +471,28 @@
         container.appendChild(div);
         return;
       }
+      if (item.type === 'memo') {
+        const memoBlock = document.createElement('div');
+        memoBlock.className = 'row-memo';
+        memoBlock.dataset.index = i;
+        memoBlock.innerHTML = `
+          <span class="row-memo-label">메모</span>
+          <textarea class="row-memo-input" data-index="${i}" placeholder="메모 입력">${escapeHtml(item.text)}</textarea>
+          <button type="button" class="row-remove" data-index="${i}" title="메모 삭제">×</button>
+        `;
+        const memoInput = memoBlock.querySelector('.row-memo-input');
+        memoInput.addEventListener('input', () => {
+          pattern.rows[i].text = memoInput.value;
+          savePattern();
+        });
+        memoBlock.querySelector('.row-remove').addEventListener('click', () => {
+          pattern.rows.splice(i, 1);
+          savePattern();
+          renderRows();
+        });
+        container.appendChild(memoBlock);
+        return;
+      }
       const row = item;
       rowOrdinal += 1;
       const num = rowOrdinal;
@@ -534,6 +557,12 @@
     renderRows();
   }
 
+  function addMemo() {
+    pattern.rows.push({ type: 'memo', text: '' });
+    savePattern();
+    renderRows();
+  }
+
   function switchPage(pageId) {
     $$('.page').forEach(p => p.classList.remove('active'));
     $$('.menu-btn').forEach(b => b.classList.remove('active'));
@@ -550,6 +579,10 @@
       if (item.type === 'divider') {
         rowOrdinal = 0;
         lines.push('--- ' + (item.title || '') + ' ---');
+        return;
+      }
+      if (item.type === 'memo') {
+        if (item.text.trim()) lines.push('[메모] ' + item.text.trim());
         return;
       }
       rowOrdinal += 1;
@@ -858,6 +891,7 @@
   function init() {
     $('#addRow').addEventListener('click', addRow);
     $('#addDividerBtn').addEventListener('click', addDivider);
+    $('#addMemoBtn').addEventListener('click', addMemo);
     $('#copyPattern').addEventListener('click', copyPatternToClipboard);
 
     $$('.menu-btn').forEach(btn => {
