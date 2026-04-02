@@ -278,10 +278,8 @@
     let rest = text;
     const numRe = /^\d+/;
     function readNumber(str) {
-      const m = str.match(/^\s*\d+/);
-      if (m) return { n: parseInt(m[0].replace(/\s/g, ''), 10), len: m[0].length };
-      const m2 = str.match(/^\d+/);
-      if (m2) return { n: parseInt(m2[0], 10), len: m2[0].length };
+      const m = str.match(/^\d+/);
+      if (m) return { n: parseInt(m[0], 10), len: m[0].length };
       return { n: 1, len: 0 };
     }
     function stitchValue(ab) {
