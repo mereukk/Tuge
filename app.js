@@ -210,18 +210,12 @@
       for (const ab of abbrevs) {
         if (!ab) continue;
         if (!lower.startsWith(ab.toLowerCase())) continue;
-        const numMatch = rest.slice(ab.length).match(/^\s*\d+/);
+        const tightNum = rest.slice(ab.length).match(/^\d+/);
         let n = 1;
         let skip = ab.length;
-        if (numMatch) {
-          n = parseInt(numMatch[0].replace(/\s/g, ''), 10);
-          skip += numMatch[0].length;
-        } else {
-          const tightNum = rest.slice(ab.length).match(/^\d+/);
-          if (tightNum) {
-            n = parseInt(tightNum[0], 10);
-            skip += tightNum[0].length;
-          }
+        if (tightNum) {
+          n = parseInt(tightNum[0], 10);
+          skip += tightNum[0].length;
         }
         const name = nameMap.get(ab.toLowerCase());
         if (name) {
