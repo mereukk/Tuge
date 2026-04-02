@@ -162,8 +162,22 @@
       if (found) continue;
       const numMatch = rest.match(numRe);
       if (numMatch) {
-        parts.push({ type: 'num', value: numMatch[0] });
-        rest = rest.slice(numMatch[0].length);
+        const afterNum = rest.slice(numMatch[0].length);
+        const lowerAfter = afterNum.toLowerCase();
+        let numAbFound = false;
+        for (const ab of abbrevs) {
+          if (ab && lowerAfter.startsWith(ab.toLowerCase())) {
+            parts.push({ type: 'num', value: numMatch[0] });
+            parts.push({ type: 'abbrev', value: afterNum.slice(0, ab.length) });
+            rest = afterNum.slice(ab.length);
+            numAbFound = true;
+            break;
+          }
+        }
+        if (!numAbFound) {
+          parts.push({ type: 'num', value: numMatch[0] });
+          rest = rest.slice(numMatch[0].length);
+        }
         continue;
       }
       const parenMatch = rest.match(parenRe);
@@ -223,8 +237,27 @@
       if (found) continue;
       const numMatch = rest.match(numRe);
       if (numMatch) {
-        out += numMatch[0];
-        rest = rest.slice(numMatch[0].length);
+        const afterNum = rest.slice(numMatch[0].length);
+        const lowerAfter = afterNum.toLowerCase();
+        let numAbFound = false;
+        for (const ab of abbrevs) {
+          if (!ab || !lowerAfter.startsWith(ab.toLowerCase())) continue;
+          const n = parseInt(numMatch[0], 10);
+          const name = nameMap.get(ab.toLowerCase());
+          if (name) {
+            const displayName = name === '쇠사슬뜨기' ? '사슬' : name;
+            if (name === '매직링' || name === '빼뜨기') out += displayName;
+            else if (name === '쇠사슬뜨기' || name === '코') out += displayName + (n > 1 ? n + '개' : ' 1개');
+            else out += displayName + (n > 1 ? ' ' + n + '코' : ' 1코');
+          } else out += rest.slice(0, numMatch[0].length + ab.length);
+          rest = afterNum.slice(ab.length);
+          numAbFound = true;
+          break;
+        }
+        if (!numAbFound) {
+          out += numMatch[0];
+          rest = rest.slice(numMatch[0].length);
+        }
         continue;
       }
       if (rest.startsWith('(') || rest.startsWith(')')) {
@@ -274,7 +307,21 @@
       if (matched) continue;
       const numMatch = rest.match(numRe);
       if (numMatch) {
-        rest = rest.slice(numMatch[0].length);
+        const afterNum = rest.slice(numMatch[0].length);
+        const lowerAfter = afterNum.toLowerCase();
+        let numAbFound = false;
+        for (const ab of abbrevs) {
+          if (!ab || !lowerAfter.startsWith(ab.toLowerCase())) continue;
+          const n = parseInt(numMatch[0], 10);
+          const one = stitchValue(ab);
+          total += one === -1 ? 1 : one * n;
+          rest = afterNum.slice(ab.length);
+          numAbFound = true;
+          break;
+        }
+        if (!numAbFound) {
+          rest = rest.slice(numMatch[0].length);
+        }
         continue;
       }
       if (rest.startsWith('(')) {
